@@ -1,13 +1,14 @@
+# Deleting a Book from the Database
 
-#### Delete
+## Overview
 
-```python
-# Delete the book instance
-book = Book.objects.get(title="Nineteen Eighty-Four")
-book.delete()
+This document explains how to delete a book from the database using Django's ORM (Object-Relational Mapping).
 
-# Confirm deletion by attempting to retrieve the book again
-try:
-    retrieved_book = Book.objects.get(title="Nineteen Eighty-Four")
-except Book.DoesNotExist:
-    print("Book has been successfully deleted.")  # Expected output
+## Steps to Delete a Book
+
+1. **Import the Model**
+
+   Import the `Book` model from your application’s models module.
+
+   ```python
+   from bookshelf.models import Book
