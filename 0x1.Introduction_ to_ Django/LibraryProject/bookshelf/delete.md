@@ -12,3 +12,12 @@ This document explains how to delete a book from the database using Django's ORM
 
    ```python
    from bookshelf.models import Book
+# Retrieve the book instance
+book = Book.objects.get(title="Nineteen Eighty-Four")
+
+# Delete the book instance
+book.delete()
+try:
+    retrieved_book = Book.objects.get(title="Nineteen Eighty-Four")
+except Book.DoesNotExist:
+    print("Book has been successfully deleted.")  # Expected output
