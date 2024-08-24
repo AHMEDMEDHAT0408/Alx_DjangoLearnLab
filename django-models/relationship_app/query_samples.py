@@ -1,5 +1,5 @@
 from .models import Author, Book
-
+from .models import Library, Librarian
 def get_books_by_author(author_name):
     # Get the author object by name
     author = Author.objects.get(name=author_name)
@@ -23,7 +23,11 @@ def get_books_in_library(library_name):
 
 # Retrieve the librarian for a library
 def get_librarian_for_library(library_name):
+    # Get the library object by name
     library = Library.objects.get(name=library_name)
-    librarian = library.librarian
+    
+    # Use objects.get() to retrieve the librarian associated with the library
+    librarian = Librarian.objects.get(library=library)
 
+    # Print the name of the librarian
     print(librarian.name)
