@@ -1,7 +1,7 @@
-from django.contrib.auth.decorators import user_passes_test, permission_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login, logout, authenticate
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import user_passes_test, permission_required
 from django.http import HttpResponse
 from .models import Book
 
