@@ -3,7 +3,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import user_passes_test, permission_required
 from django.http import HttpResponse
-from .models import Book  # Assuming Book model is in the same app
+from .models import Book
 
 # Task 1: Implementing User Authentication in Django
 
@@ -38,15 +38,13 @@ def logout_view(request):
 
 def is_admin(user):
     return hasattr(user, 'userprofile') and user.userprofile.role == 'Admin'
+
 def is_librarian(user):
     return hasattr(user, 'userprofile') and user.userprofile.role == 'Librarian'
 
 def is_member(user):
     return hasattr(user, 'userprofile') and user.userprofile.role == 'Member'
 
-@user_passes_test(is_admin)
-def admin_view(request):
-    return render(request, 'relationship_app/admin_view.html')
 @user_passes_test(is_admin, login_url='login')
 def admin_view(request):
     return render(request, 'relationship_app/admin_view.html')
