@@ -17,3 +17,7 @@ def register(request):
 @login_required
 def profile(request):
     return render(request, 'blog/profile.html')
+
+@login_required
+def profile(request):
+    return render(request, 'blog/profile.html')
