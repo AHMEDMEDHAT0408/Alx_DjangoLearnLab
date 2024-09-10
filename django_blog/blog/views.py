@@ -8,7 +8,6 @@ from django.urls import reverse_lazy
 from .forms import CustomUserCreationForm, UserUpdateForm, CommentForm
 from .models import Post, Comment
 
-
 # Registration View
 def register(request):
     if request.method == 'POST':
@@ -19,7 +18,6 @@ def register(request):
     else:
         form = CustomUserCreationForm()
     return render(request, 'blog/register.html', {'form': form})
-
 
 # User Profile View
 @login_required
@@ -33,7 +31,6 @@ def profile(request):
         form = UserUpdateForm(instance=request.user)
     return render(request, 'blog/profile.html', {'form': form})
 
-
 # Blog Post Views for CRUD Operations
 
 # List View for all posts
@@ -43,18 +40,16 @@ class PostListView(ListView):
     context_object_name = 'posts'
     ordering = ['-date_posted']  # Display newest posts first
 
-
-# Detail View for a single post with comments
+# Detail View for a single post
 class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'  # Specify your own template
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['comments'] = self.object.comments.all()  # Fetch comments related to the post
-        context['form'] = CommentForm()  # Provide a comment form for authenticated users
+        context['comments'] = Comment.objects.filter(post=self.object).order_by('-created_at')
+        context['form'] = CommentForm()
         return context
-
 
 # Create View for a new post (only for authenticated users)
 class PostCreateView(LoginRequiredMixin, CreateView):
@@ -66,7 +61,6 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
-
 
 # Update View for editing an existing post (only for the post author)
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -84,7 +78,6 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         post = self.get_object()
         return self.request.user == post.author
 
-
 # Delete View for deleting a post (only for the post author)
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
@@ -96,10 +89,9 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         post = self.get_object()
         return self.request.user == post.author
 
-
 # Comment Views
 
-# Create a comment for a specific post
+# Create View for adding a comment
 @login_required
 def add_comment(request, post_id):
     post = get_object_or_404(Post, id=post_id)
@@ -110,19 +102,17 @@ def add_comment(request, post_id):
             comment.post = post
             comment.author = request.user
             comment.save()
-            return redirect('post-detail', pk=post.id)
+            return redirect('post-detail', pk=post_id)
     else:
         form = CommentForm()
-    return render(request, 'blog/add_comment.html', {'form': form})
+    return redirect('post-detail', pk=post_id)
 
-
-# Update a comment (only by the comment's author)
+# Update View for editing a comment
 @login_required
-def update_comment(request, comment_id):
-    comment = get_object_or_404(Comment, id=comment_id)
+def update_comment(request, pk):
+    comment = get_object_or_404(Comment, id=pk)
     if request.user != comment.author:
         return redirect('post-detail', pk=comment.post.id)
-
     if request.method == 'POST':
         form = CommentForm(request.POST, instance=comment)
         if form.is_valid():
@@ -130,14 +120,13 @@ def update_comment(request, comment_id):
             return redirect('post-detail', pk=comment.post.id)
     else:
         form = CommentForm(instance=comment)
-    return render(request, 'blog/update_comment.html', {'form': form})
+    return render(request, 'blog/comment_form.html', {'form': form})
 
-
-# Delete a comment (only by the comment's author)
+# Delete View for deleting a comment
 @login_required
-def delete_comment(request, comment_id):
-    comment = get_object_or_404(Comment, id=comment_id)
-    post_id = comment.post.id
+def delete_comment(request, pk):
+    comment = get_object_or_404(Comment, id=pk)
     if request.user == comment.author:
+        post_id = comment.post.id
         comment.delete()
     return redirect('post-detail', pk=post_id)
