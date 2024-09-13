@@ -1,3 +1,5 @@
+# Updated urlpatterns in blog/urls.py
+
 from django.urls import path
 from .views import (
     PostListView, PostDetailView, PostCreateView, PostUpdateView, PostDeleteView,
@@ -20,7 +22,7 @@ urlpatterns = [
     path('comment/<int:pk>/update/', update_comment, name='update-comment'),
     path('comment/<int:pk>/delete/', delete_comment, name='delete-comment'),
 
-    # New paths
+    # New paths for tagging and search
     path('tags/<slug:tag_slug>/', PostsByTagView.as_view(), name='posts-by-tag'),
     path('search/', search, name='search'),
 ]
