@@ -8,12 +8,9 @@ from django.urls import reverse_lazy
 from .forms import CustomUserCreationForm, UserUpdateForm, CommentForm
 from .models import Post, Comment
 from django.db.models import Q
-from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView
-from .models import Post
 from taggit.models import Tag
 
-
+# Search Functionality
 def search(request):
     query = request.GET.get('q')
     if query:
@@ -27,8 +24,8 @@ def search(request):
 
     return render(request, 'blog/search_results.html', {'posts': posts, 'query': query})
 
-
-class PostsByTagView(ListView):
+# List posts filtered by tag
+class PostByTagListView(ListView):  # Renamed this class to match the URL pattern requirement
     model = Post
     template_name = 'blog/posts_by_tag.html'
     context_object_name = 'posts'
@@ -41,6 +38,7 @@ class PostsByTagView(ListView):
         context = super().get_context_data(**kwargs)
         context['tag'] = self.kwargs.get('tag_slug')
         return context
+
 # Registration View
 def register(request):
     if request.method == 'POST':
@@ -51,7 +49,6 @@ def register(request):
     else:
         form = CustomUserCreationForm()
     return render(request, 'blog/register.html', {'form': form})
-
 
 # User Profile View
 @login_required
@@ -65,16 +62,13 @@ def profile(request):
         form = UserUpdateForm(instance=request.user)
     return render(request, 'blog/profile.html', {'form': form})
 
-
 # Blog Post Views for CRUD Operations
-
 # List View for all posts
 class PostListView(ListView):
     model = Post
     template_name = 'blog/post_list.html'  # Specify your own template
     context_object_name = 'posts'
     ordering = ['-date_posted']  # Display newest posts first
-
 
 # Detail View for a single post with comments
 class PostDetailView(DetailView):
@@ -87,7 +81,6 @@ class PostDetailView(DetailView):
         context['form'] = CommentForm()  # Provide a comment form for authenticated users
         return context
 
-
 # Create View for a new post (only for authenticated users)
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
@@ -98,7 +91,6 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
-
 
 # Update View for editing an existing post (only for the post author)
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
@@ -116,7 +108,6 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         post = self.get_object()
         return self.request.user == post.author
 
-
 # Delete View for deleting a post (only for the post author)
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
@@ -128,9 +119,7 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         post = self.get_object()
         return self.request.user == post.author
 
-
 # Comment Views
-
 # Create a comment for a specific post
 @login_required
 def add_comment(request, post_id):
@@ -147,7 +136,6 @@ def add_comment(request, post_id):
         form = CommentForm()
     return render(request, 'blog/add_comment.html', {'form': form})
 
-
 # Update a comment (only by the comment's author)
 @login_required
 def update_comment(request, comment_id):
@@ -163,7 +151,6 @@ def update_comment(request, comment_id):
     else:
         form = CommentForm(instance=comment)
     return render(request, 'blog/update_comment.html', {'form': form})
-
 
 # Delete a comment (only by the comment's author)
 @login_required
