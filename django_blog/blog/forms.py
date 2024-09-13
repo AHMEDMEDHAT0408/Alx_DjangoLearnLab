@@ -24,6 +24,7 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ['title', 'content', 'tags']  # Ensure 'tags' is included in fields
-
-    # Use TagWidget to render tags
-    tags = forms.CharField(widget=TagWidget(), required=False)
+        tags = forms.CharField(widget=TagWidget(), required=False)
+         widgets = {
+            'tags': TagWidget()  # Use TagWidget for the tags field
+        }
