@@ -20,11 +20,11 @@ urlpatterns = [
     path('post/<int:pk>/delete/', views.PostDeleteView.as_view(), name='post-delete'),
 
     # URL for creating a new comment on a post
-    path('post/<int:post_id>/comments/new/', views.add_comment, name='comment-create'),
+    path('post/<int:pk>/comments/new/', views.add_comment, name='comment-create'),
 
     # URL for updating a comment
-    path('post/<int:post_id>/comments/<int:pk>/edit/', views.update_comment, name='comment-update'),
+    path('comment/<int:pk>/update/', views.update_comment, name='comment-update'),
 
     # URL for deleting a comment
-    path('post/<int:post_id>/comments/<int:pk>/delete/', views.delete_comment, name='comment-delete'),
+    path('comment/<int:pk>/delete/', views.delete_comment, name='comment-delete'),
 ]
