@@ -30,7 +30,7 @@ class PostDetailView(DetailView):
 
 # Create View for adding a comment
 @login_required
-def add_comment(request, post_id):
+def CommentCreateView(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     if request.method == 'POST':
         form = CommentForm(request.POST)
@@ -46,7 +46,7 @@ def add_comment(request, post_id):
 
 # Update View for editing a comment
 @login_required
-def update_comment(request, pk):
+def CommentUpdateView(request, pk):
     comment = get_object_or_404(Comment, id=pk)
     if request.user != comment.author:
         return redirect('post-detail', pk=comment.post.id)
@@ -61,7 +61,7 @@ def update_comment(request, pk):
 
 # Delete View for deleting a comment
 @login_required
-def delete_comment(request, pk):
+def CommentDeleteView(request, pk):
     comment = get_object_or_404(Comment, id=pk)
     if request.user == comment.author:
         post_id = comment.post.id
