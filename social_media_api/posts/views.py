@@ -1,11 +1,8 @@
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework import viewsets, permissions, filters, generics
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework import viewsets, permissions, filters
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
 from accounts.models import CustomUser  # Import CustomUser to check following relationships
-
 
 # Post ViewSet for managing CRUD operations on posts
 class PostViewSet(viewsets.ModelViewSet):
@@ -33,13 +30,13 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user, post=post)
 
 
-# Feed View to get posts from followed users
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def user_feed(request):
-    user = request.user
-    followed_users = user.following.all()  # Get the users that the current user is following
-    posts = Post.objects.filter(author__in=followed_users).order_by('-created_at')
+# Class-based view for the user feed to get posts from followed users
+class UserFeedView(generics.ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthenticated]
 
-    serializer = PostSerializer(posts, many=True)
-    return Response(serializer.data)
+    # Retrieve posts from users the current user is following
+    def get_queryset(self):
+        user = self.request.user
+        following_users = user.following.all()  # Get the list of users the current user follows
+        return Post.objects.filter(author__in=following_users).order_by('-created_at')  # Fetch posts by followed users, ordered by creation date
